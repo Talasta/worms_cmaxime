@@ -22,6 +22,7 @@ typedef struct	s_object
 	double vy;
 	int ori;
 	int type;
+	long live;
 	//char *type;
 	//void *strct;
 }								t_object;
@@ -30,7 +31,10 @@ typedef struct	s_cnf
 {
 	int		*map;
 	unsigned int		time;
+	long						timer;
 	t_list	*object;
+	t_list  *current;
+	int			status;
 }				t_cnf;
 
 typedef struct	s_mlx

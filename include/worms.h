@@ -50,6 +50,8 @@ int		mouse(int button, int x, int y, void *param);
 int		drag_drop(int x, int y, void *param);
 /**/
 
+t_list	*get_worm(t_list *object);
+
 int		get_pxl_val(int *img, int x, int y);
 
 t_mlx	w_image_drawer(t_mlx mlx);

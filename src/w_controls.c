@@ -13,9 +13,11 @@ void 	w_speed(t_object *obj, int *map)
 int		get_inc_x(int x, int y, int *map)
 {
 	int i;
+	int j;
 
 	i = 0;
-	while (1)
+	j = -1;
+	while (++j < 50)
 	{
 		if (get_pxl_val(map, x + i, y) == WORMS_COLOR_BACK)
 			return (1);
@@ -23,6 +25,25 @@ int		get_inc_x(int x, int y, int *map)
 			return (-1);
 		i++;
 	}
+	return (0);
+}
+
+int		get_inc_y(int x, int y, int *map)
+{
+	int i;
+	int j;
+
+	i = 0;
+	j = -1;
+	while (++j < 50)
+	{
+		if (get_pxl_val(map, x, y + i) == WORMS_COLOR_BACK)
+			return (1);
+		if (get_pxl_val(map, x, y - i) == WORMS_COLOR_BACK)
+			return (-1);
+		i++;
+	}
+	return (0);
 }
 
 t_object 	*w_recalculate_y(t_object *obj, int *map)
@@ -30,17 +51,18 @@ t_object 	*w_recalculate_y(t_object *obj, int *map)
 	int x;
 	int y;
 	int i;
+	int j;
 
-	i = 0;
 	x = (int)obj->x;
 	y = (int)obj->y;
 	i = get_inc_x(x, y, map);
+	j = get_inc_y(x, y, map);
 	while (get_pxl_val(map, x, y) != WORMS_COLOR_BACK)
 	{
 		if (obj->vx != 0)
 			x += i;
 		if (obj->vy != 0)
-		y = (obj->vy >= 0) ? y - 1 : y + 1;
+			y += j;
 	}
 	if (get_pxl_val(map, x, y + 1) == WORMS_COLOR_BACK)
 	{
@@ -160,13 +182,6 @@ void 	w_update_pos(t_object *obj, int *map)
 	{
 		obj = w_recalculate_y(obj, map);
 		w_recalculate_speed(obj, map);
-		/*
-		if (obj->vy > 2.0)
-			obj->vy *= -1.0 / ABSORBANCE_T;
-		else
-			obj->vy = 0.0;
-		obj->vx /= (0.2 / (obj->vx * obj->vx) + ABSORBANCE_T);
-		*/
 	}
 }
 
@@ -183,17 +198,135 @@ void 	w_update_objs(t_list *objects, int *map)
 	}
 }
 
+void free_obj(t_list **object, t_list *elem)
+{
+	t_list 	*buff;
+	t_list	*list;
+
+	list = *object;
+	if (list == elem)
+	{
+		buff = list;
+		*object = elem->next;
+		free(buff->content);
+		free(buff);
+	}
+	while (list->next)
+	{
+		if (list->next == elem)
+		{
+			buff = list->next;
+			list->next = list->next->next;
+			free(buff->content);
+			free(buff);
+		}
+		if (list->next)
+			list = list->next;
+	}
+}
+
+int	*set_map_pxl(int *map, int x, int y, int color)
+{
+	if (x < 800 && y < 500 && x > -1 && y > -1)
+		map[x + (y * 800)] = color;
+	return (map);
+}
+
+void 	explode_map(t_mlx *mlx, t_object *obj)
+{
+	double			x;
+	double			y;
+	int			a;
+	double		rad;
+	double			i;
+
+	if (obj->type == 2)
+	{
+		a = 0;
+		while (a < 180)
+		{
+			rad = (double)a * M_PI / 180.0;
+			x = cos(rad) * 20.0 + obj->x;
+			y = sin(rad) * 20.0 + obj->y;
+			i = sin((double)(360 - a) * M_PI / 180.0) * 20.0 + obj->y;
+			while (i <= y)
+			{
+				mlx->cnf.map = set_map_pxl(mlx->cnf.map, x, i, WORMS_COLOR_BACK);
+				i += 1.0;
+			}
+			a++;
+		}
+	}
+}
+
+void 	update_time_objects(t_list **object, t_mlx *mlx)
+{
+	t_list 		*list;
+	t_object	*obj;
+
+	list = *object;
+	while (list)
+	{
+		obj = list->content;
+		if (obj->live != 0 && obj->live < time(NULL))
+		{
+			explode_map(mlx, obj);
+			free_obj(object, list);
+		}
+		list = list->next;
+	}
+}
+
+void timer_print(t_list *list, t_mlx *mlx)
+{
+	t_object *obj;
+
+	while (list)
+	{
+		obj = list->content;
+		if (obj->type == 2)
+			mlx_string_put(mlx->mlx, mlx->win, obj->x - 5, obj->y - 25, 0x00ff0000, ft_itoa(obj->live - time(NULL)));
+		list = list->next;
+	}
+}
+
+t_list *get_next_worm(t_list *curr, t_list *list)
+{
+	curr = curr->next;
+	while (curr)
+	{
+		if (((t_object*)(curr->content))->type == 1)
+			return (curr);
+			curr = curr->next;
+	}
+	return (get_worm(list));
+}
+
+void 	update_time_status(t_mlx *mlx)
+{
+	if (mlx->cnf.status == 1)
+	{
+		mlx->cnf.current = get_next_worm(mlx->cnf.current, mlx->cnf.object);
+		mlx->cnf.status = 0;
+	}
+}
+
 int		refresh(void *param)
 {
 	t_mlx	*mlx;
 
 	mlx = (t_mlx*)param;
+	//ft_putnbr(time(NULL)); ft_putchar('\n');
 	mlx->cnf.time = (mlx->cnf.time + 1);
+	update_time_status(mlx);
+	update_time_objects(&(mlx->cnf.object), mlx);
 	w_update_objs(mlx->cnf.object, mlx->cnf.map);
 	*mlx = w_image_drawer(*mlx);
 	mlx_put_image_to_window(mlx->mlx, mlx->win, mlx->img.img, 0, 0);
 	*mlx = w_image_drawer2(*mlx);
 	mlx_put_image_to_window(mlx->mlx, mlx->win, mlx->img.img, 0, 0);
+	mlx_string_put(mlx->mlx, mlx->win, 780, 10, 0x00ff0000, ft_itoa(time(NULL) - mlx->cnf.timer));
+	timer_print(mlx->cnf.object, mlx);
 	return (0);
 }
 
@@ -220,7 +353,7 @@ void  move_worm(t_object *obj, double key, int *map)
 {
 	int move;
 
-	if (get_pxl_val(map, obj->x, obj->y + 1) != WORMS_COLOR_BACK)
+	if (obj->type == 1 && get_pxl_val(map, obj->x, obj->y + 1) != WORMS_COLOR_BACK)
 	{
 		move = check_slop(map, obj->x + key, obj->y);
 		if (move < 5 && move > -5)
@@ -243,33 +376,21 @@ void  move_worm(t_object *obj, double key, int *map)
 t_mlx arrow_controls(t_mlx mlx, double key)
 {
 	t_object 	*obj;
-	t_list		*objects;
 
-	objects = mlx.cnf.object;
-	while (objects)
-	{
-		obj = objects->content;
-		move_worm(obj, key, mlx.cnf.map);
-		objects = objects->next;
-	}
+	obj = mlx.cnf.current->content;
+	move_worm(obj, key, mlx.cnf.map);
 	return (mlx);
 }
 
 t_mlx jump(t_mlx mlx)
 {
 	t_object 	*obj;
-	t_list		*objects;
 
-	objects = mlx.cnf.object;
-	while (objects)
+	obj = mlx.cnf.current->content;
+	if (obj->type == 1 && get_pxl_val(mlx.cnf.map, obj->x, obj->y + 1) != WORMS_COLOR_BACK)
 	{
-		obj = objects->content;
-		if (obj->type == 1 && get_pxl_val(mlx.cnf.map, obj->x, obj->y + 1) != WORMS_COLOR_BACK)
-		{
-			obj->vy = -1.0;
-			obj->vx = obj->ori == 1 ? 1.0 : -1.0;
-		}
-		objects = objects->next;
+		obj->vy = -1.2;
+		obj->vx = obj->ori == 1 ? 1.0 : -1.0;
 	}
 	return (mlx);
 }
@@ -281,22 +402,20 @@ t_mlx throw_grenade(t_mlx mlx)
 	t_list		*objects;
 
 	objects = mlx.cnf.object;
-	while (objects)
+	obj = mlx.cnf.current->content;
+	if (obj->type == 1)
 	{
-		obj = objects->content;
-		if (obj->type == 1)
-		{
-			obj1.vy = -4.0;
-			obj1.vx = obj->ori == 1 ? 2.0 : -2.0;
-			obj1.x = obj->x;
-			obj1.y = obj->y;
-			obj1.m = 0.008;
-			obj1.ori = 0;
-			obj1.type = 2;
-			ft_lstaddend(&(objects), ft_lstnew(&obj1, sizeof(t_object)));
-		}
-		objects = objects->next;
+		obj1.vy = -4.0;
+		obj1.vx = obj->ori == 1 ? 2.0 : -2.0;
+		obj1.x = obj->x;
+		obj1.y = obj->y;
+		obj1.m = 0.008;
+		obj1.ori = 0;
+		obj1.type = 2;
+		obj1.live = time(NULL) + 5;
+		ft_lstaddend(&(objects), ft_lstnew(&obj1, sizeof(t_object)));
 	}
+	mlx.cnf.status = 1;
 	return (mlx);
 }
 
@@ -305,13 +424,11 @@ int		actions(int key_hook, void *param)
 	t_mlx	*mlx;
 
 	mlx = (t_mlx*)param;
-	// 123 < | 124 >
-	ft_putnbr(key_hook); ft_putchar('\n');
 	if (key_hook == 123 || key_hook == 124)
 		*mlx = arrow_controls(*mlx, (key_hook == 124) ? 0.5 : -0.5);
 	if (key_hook == 49)
 		*mlx = jump(*mlx);
-	if (key_hook == 12)
+	if (key_hook == 12 && mlx->cnf.status == 0)
 		*mlx = throw_grenade(*mlx);
 	if (key_hook == 53)
 	{

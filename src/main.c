@@ -11,6 +11,7 @@ t_list	*add_worm(t_list *object, int x, int y, double vx)
 	obj.m = 0.004;
 	obj.ori = 0;
 	obj.type = 1;
+	obj.live = 0;
 	ft_lstaddend(&(object), ft_lstnew(&obj, sizeof(t_object)));
 	return (object);
 }
@@ -20,12 +21,25 @@ t_list	*init_worms(t_list *object)
 	int i;
 
 	i = -1;
-	while (++i < 1)
+	while (++i < 4)
 	{
-		object = add_worm(object, 400, 200, 0.0);
+		object = add_worm(object, 200 + i * 150, 200, 0.0);
 	}
 	//object = add_worm(object, 400, 200, 0.0);
 	return (object);
+}
+
+t_list	*get_worm(t_list *object)
+{
+	t_object *obj;
+	while (object)
+	{
+		obj = object->content;
+		if (obj->type == 1)
+			return (object);
+		object = object->next;
+	}
+	return (NULL);
 }
 
 t_cnf	cnf_init(void)
@@ -34,8 +48,11 @@ t_cnf	cnf_init(void)
 
   cnf.map = w_map_gen(1);
 	cnf.time = 0;
+	cnf.status = 0;
+	cnf.timer = time(NULL);
 	cnf.object = NULL;
 	cnf.object = init_worms(cnf.object);
+	cnf.current = get_worm(cnf.object);
 	return (cnf);
 }
 
