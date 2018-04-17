@@ -48,8 +48,10 @@ t_cnf	cnf_init(void)
 
   cnf.map = w_map_gen(1);
 	cnf.time = 0;
+	cnf.strengh = 0.0;
+	cnf.angle = 90;
 	cnf.status = 0;
-	cnf.timer = time(NULL);
+	cnf.timer = time(NULL) + 30;
 	cnf.object = NULL;
 	cnf.object = init_worms(cnf.object);
 	cnf.current = get_worm(cnf.object);

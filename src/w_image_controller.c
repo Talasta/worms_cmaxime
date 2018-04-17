@@ -52,6 +52,7 @@ t_img		w_draw_box(t_img img, int x, int y, int size)
 }
 
 #define RED 0x00ff0000
+#define BLE 0x000000ff
 #define BCK 0x00000000
 #define FSH 0x00ffa5f7
 #define WTH 0x00ffffff
@@ -61,6 +62,24 @@ t_img		w_draw_box(t_img img, int x, int y, int size)
 #define GN1 0x003a741a
 #define GN2 0x0096d161
 #define GN3 0x0073c734
+
+int *get_arrow_graph(void)
+{
+	static int worm[100] = {
+		RED, RED, BLE, BLE, BLE, BLE, BLE, RED, RED, RED,
+		RED, RED, BLE, BLE, BLE, BLE, BLE, RED, RED, RED,
+		RED, RED, BLE, BLE, BLE, BLE, BLE, RED, RED, RED,
+		RED, RED, BLE, BLE, BLE, BLE, BLE, RED, RED, RED,
+		RED, RED, BLE, BLE, BLE, BLE, BLE, RED, RED, RED,
+		BLE, BLE, BLE, BLE, BLE, BLE, BLE, BLE, BLE, RED,
+		RED, BLE, BLE, BLE, BLE, BLE, BLE, BLE, RED, RED,
+		RED, RED, BLE, BLE, BLE, BLE, BLE, RED, RED, RED,
+		RED, RED, RED, BLE, BLE, BLE, RED, RED, RED, RED,
+		RED, RED, RED, RED, BLE, RED, RED, RED, RED, RED
+};
+
+	return (worm);
+}
 
 int *get_grenad_graph(void)
 {
@@ -125,6 +144,23 @@ t_img w_draw_worm(t_img img, int x, int y, int side)
 	return (img);
 }
 
+t_img w_draw_arrow(t_img img, int x, int y)
+{
+	int *worm;
+	int i;
+
+	worm = get_arrow_graph();
+	i = -1;
+	while (++i < 100)
+	{
+		if (worm[i] != RED)
+		{
+			img = set_img_pxl(img, x + (i % 10) - 5, y + (i / 10) - 30, RED);
+		}
+	}
+	return (img);
+}
+
 t_img w_draw_gren(t_img img, int x, int y, int side)
 {
 	int *worm;
@@ -143,6 +179,26 @@ t_img w_draw_gren(t_img img, int x, int y, int side)
 	return (img);
 }
 
+t_img 	w_draw_viseur(t_img img, t_object *obj, int angle)
+{
+	double rad;
+	double x;
+	double y;
+	int i;
+
+	angle = obj->ori == 1 ? 360 - angle : angle;
+	rad = (double)(angle + 90) * M_PI / 180.0;
+	x = (cos(rad) * 50.0) + obj->x;
+	y = (sin(rad) * 50.0) + obj->y;
+	i = -1;
+	while (++i < 9)
+	{
+		img = set_img_pxl(img, x + i - 4, y - 7, RED);
+		img = set_img_pxl(img, x, y + i - 4 - 7, RED);
+	}
+	return (img);
+}
+
 t_mlx		w_image_objects(t_mlx mlx)
 {
 	t_list *object;
@@ -156,13 +212,11 @@ t_mlx		w_image_objects(t_mlx mlx)
 			mlx.img = w_draw_worm(mlx.img, obj->x, obj->y, obj->ori);
 		if (obj->type == 2)
 			mlx.img = w_draw_gren(mlx.img, obj->x, obj->y, obj->ori);
-		//mlx.img = circle(mlx.img, obj->x, obj->y, 3);
-		/*mlx.img = set_img_pxl(mlx.img, obj->x, obj->y, 0x00ff0000);
-		mlx.img = set_img_pxl(mlx.img, obj->x, obj->y -1, 0x00ff0000);
-		mlx.img = set_img_pxl(mlx.img, obj->x, obj->y -2, 0x00ff0000);
-		mlx.img = set_img_pxl(mlx.img, obj->x, obj->y-3, 0x00ff0000);*/
 		object = object->next;
 	}
+	obj = mlx.cnf.current->content;
+	mlx.img = w_draw_arrow(mlx.img, obj->x, obj->y);
+	mlx.img = w_draw_viseur(mlx.img, obj, mlx.cnf.angle);
 	return (mlx);
 }
 

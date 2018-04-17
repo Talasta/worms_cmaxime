@@ -35,6 +35,8 @@ typedef struct	s_cnf
 	t_list	*object;
 	t_list  *current;
 	int			status;
+	double	strengh;
+	int 		angle;
 }				t_cnf;
 
 typedef struct	s_mlx

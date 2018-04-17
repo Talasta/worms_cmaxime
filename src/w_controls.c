@@ -304,9 +304,10 @@ t_list *get_next_worm(t_list *curr, t_list *list)
 
 void 	update_time_status(t_mlx *mlx)
 {
-	if (mlx->cnf.status == 1)
+	if (mlx->cnf.timer < time(NULL))
 	{
 		mlx->cnf.current = get_next_worm(mlx->cnf.current, mlx->cnf.object);
+		mlx->cnf.timer = time(NULL) + 30;
 		mlx->cnf.status = 0;
 	}
 }
@@ -325,7 +326,7 @@ int		refresh(void *param)
 	mlx_put_image_to_window(mlx->mlx, mlx->win, mlx->img.img, 0, 0);
 	*mlx = w_image_drawer2(*mlx);
 	mlx_put_image_to_window(mlx->mlx, mlx->win, mlx->img.img, 0, 0);
-	mlx_string_put(mlx->mlx, mlx->win, 780, 10, 0x00ff0000, ft_itoa(time(NULL) - mlx->cnf.timer));
+	mlx_string_put(mlx->mlx, mlx->win, 780, 10, 0x00ff0000, ft_itoa(mlx->cnf.timer - time(NULL)));
 	timer_print(mlx->cnf.object, mlx);
 	return (0);
 }
@@ -400,13 +401,15 @@ t_mlx throw_grenade(t_mlx mlx)
 	t_object 	*obj;
 	t_object	obj1;
 	t_list		*objects;
+	double    angle;
 
 	objects = mlx.cnf.object;
 	obj = mlx.cnf.current->content;
 	if (obj->type == 1)
 	{
-		obj1.vy = -4.0;
-		obj1.vx = obj->ori == 1 ? 2.0 : -2.0;
+		angle = (double)(mlx.cnf.angle - 90) * M_PI / 180.0;
+		obj1.vy = sin(angle) * -6.0;
+		obj1.vx = obj->ori == 1 ? cos(angle) * 5.0 : cos(angle) * -5.0;
 		obj1.x = obj->x;
 		obj1.y = obj->y;
 		obj1.m = 0.008;
@@ -416,7 +419,20 @@ t_mlx throw_grenade(t_mlx mlx)
 		ft_lstaddend(&(objects), ft_lstnew(&obj1, sizeof(t_object)));
 	}
 	mlx.cnf.status = 1;
+	mlx.cnf.timer = time(NULL) + 5;
 	return (mlx);
+}
+
+void update_viseur(t_mlx *mlx, int key_hook)
+{
+	if (key_hook == 126 && mlx->cnf.angle < 180)
+	{
+		mlx->cnf.angle++;
+	}
+	else if (mlx->cnf.angle > 0)
+	{
+		mlx->cnf.angle--;
+	}
 }
 
 int		actions(int key_hook, void *param)
@@ -424,6 +440,9 @@ int		actions(int key_hook, void *param)
 	t_mlx	*mlx;
 
 	mlx = (t_mlx*)param;
+	// bas 125 - haut 126
+	if (key_hook == 125 || key_hook == 126)
+		update_viseur(mlx, key_hook);
 	if (key_hook == 123 || key_hook == 124)
 		*mlx = arrow_controls(*mlx, (key_hook == 124) ? 0.5 : -0.5);
 	if (key_hook == 49)
