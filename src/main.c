@@ -50,6 +50,7 @@ t_cnf	cnf_init(void)
 	cnf.time = 0;
 	cnf.strengh = 0.0;
 	cnf.angle = 90;
+	cnf.gre_timer = 5;
 	cnf.status = 0;
 	cnf.timer = time(NULL) + 30;
 	cnf.object = NULL;

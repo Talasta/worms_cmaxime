@@ -37,6 +37,7 @@ typedef struct	s_cnf
 	int			status;
 	double	strengh;
 	int 		angle;
+	int 		gre_timer;
 }				t_cnf;
 
 typedef struct	s_mlx

@@ -415,7 +415,7 @@ t_mlx throw_grenade(t_mlx mlx)
 		obj1.m = 0.008;
 		obj1.ori = 0;
 		obj1.type = 2;
-		obj1.live = time(NULL) + 5;
+		obj1.live = time(NULL) + mlx.cnf.gre_timer;
 		ft_lstaddend(&(objects), ft_lstnew(&obj1, sizeof(t_object)));
 	}
 	mlx.cnf.status = 1;
@@ -435,12 +435,30 @@ void update_viseur(t_mlx *mlx, int key_hook)
 	}
 }
 
+void update_gre_timer(t_mlx *mlx, int key_hook)
+{
+		if (key_hook == 18)
+			mlx->cnf.gre_timer = 1;
+		if (key_hook == 19)
+			mlx->cnf.gre_timer = 2;
+		if (key_hook == 20)
+			mlx->cnf.gre_timer = 3;
+		if (key_hook == 21)
+			mlx->cnf.gre_timer = 4;
+		if (key_hook == 23)
+			mlx->cnf.gre_timer = 5;
+}
+
 int		actions(int key_hook, void *param)
 {
 	t_mlx	*mlx;
 
 	mlx = (t_mlx*)param;
 	// bas 125 - haut 126
+	// ft_putnbr(key_hook); ft_putchar('\n');
+	if (key_hook == 18 || key_hook == 19 || key_hook == 20 || key_hook == 21
+		|| key_hook == 23)
+		update_gre_timer(mlx, key_hook);
 	if (key_hook == 125 || key_hook == 126)
 		update_viseur(mlx, key_hook);
 	if (key_hook == 123 || key_hook == 124)
