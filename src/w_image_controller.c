@@ -83,17 +83,19 @@ int *get_arrow_graph(void)
 
 int *get_grenad_graph(void)
 {
-	static int worm[100] = {
-		RED, RED, GR1, GR1, GR1, GR1, RED, RED, RED, RED,
-		RED, GR2, GR1, GR1, GR1, GR1, GR3, GR3, RED, RED,
-		GR3, GN1, GN1, GR1, GN1, GN1, GN1, GR3, GR3, RED,
-		GR3, GN1, GN2, GR1, GN2, GN2, GN1, RED, GR3, GR3,
-		GN1, GR3, GR3, GN3, GN1, GN1, GN2, GN1, RED, GR3,
-		GN1, GN3, GN3, GN1, GN3, GN3, GN3, GN1, RED, GR3,
-		GN1, GN2, GN1, GN3, GN1, GN1, GN2, GN1, RED, RED,
-		GN1, GN3, GN3, GN1, GN3, GN3, GN3, GN1, RED, RED,
-		RED, GN1, GN2, GN2, GN2, GN2, GN1, RED, RED, RED,
-		RED, GN1, GN1, GN1, GN1, GN1, GN1, RED, RED, RED
+	static int worm[144] = {
+		RED, RED, RED, BCK, BCK, BCK, BCK, RED, RED, RED, RED, RED,
+		RED, RED, BCK, GR1, GR1, GR1, GR1, BCK, BCK, RED, RED, RED,
+		RED, BCK, GR2, GR1, GR1, GR1, GR1, GR3, GR3, BCK, RED, RED,
+		BCK, GR3, GN1, GN1, GR1, GN1, GN1, GN1, GR3, GR3, BCK, RED,
+		BCK, GR3, GN1, GN2, GR1, GN2, GN2, GN1, BCK, GR3, GR3, BCK,
+		BCK, GN1, GR3, GR3, GN3, GN1, GN1, GN2, GN1, BCK, GR3, BCK,
+		BCK, GN1, GN3, GN3, GN1, GN3, GN3, GN3, GN1, BCK, GR3, BCK,
+		BCK, GN1, GN2, GN1, GN3, GN1, GN1, GN2, GN1, BCK, BCK, RED,
+		BCK, GN1, GN3, GN3, GN1, GN3, GN3, GN3, GN1, BCK, RED, RED,
+		RED, BCK, GN1, GN2, GN2, GN2, GN2, GN1, BCK, RED, RED, RED,
+		RED, BCK, GN1, GN1, GN1, GN1, GN1, GN1, BCK, RED, RED, RED,
+		RED, RED, BCK, BCK, BCK, BCK, BCK, BCK, RED, RED, RED, RED
 };
 
 	return (worm);
@@ -169,11 +171,11 @@ t_img w_draw_gren(t_img img, int x, int y, int side)
 	worm = get_grenad_graph();
 	(void)side;
 	i = -1;
-	while (++i < 100)
+	while (++i < 144)
 	{
 		if (worm[i] != RED)
 		{
-			img = set_img_pxl(img, x + (i % 10) - 5, y + (i / 10) - 5, worm[i]);
+			img = set_img_pxl(img, x + (i % 12) - 6, y + (i / 12) - 6, worm[i]);
 		}
 	}
 	return (img);

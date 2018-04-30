@@ -50,7 +50,42 @@ int		mouse(int button, int x, int y, void *param);
 int		drag_drop(int x, int y, void *param);
 /**/
 
+/*
+** ACTIONS CONTROLS FCTS
+**/
+int	  *set_map_pxl(int *map, int x, int y, int color);
+void 	explode_map(t_mlx *mlx, t_object *obj);
+void 	update_time_objects(t_list **object, t_mlx *mlx);
+t_mlx throw_grenade(t_mlx mlx);
+void update_gre_timer(t_mlx *mlx, int key_hook);
+int check_slop(int *map, int x, int y);
+void  move_worm(t_object *obj, double key, int *map);
+t_mlx move_controls(t_mlx mlx, double key);
+t_list *get_next_worm(t_list *curr, t_list *list);
+void 	update_time_status(t_mlx *mlx);
+void update_scope(t_mlx *mlx, int key_hook);
+t_mlx jump(t_mlx mlx);
+/**/
+
+/*
+** COLLISION CONTROLS FCTS
+**/
+unsigned char *get_collision_const(void);
+unsigned char get_collision_mask(int x, int y, int *map);
+int 	get_transpho(int x, int y, int *map);
+void 	w_recalculate_speed(t_object *obj, int *map);
+void 	w_update_objs(t_list *objects, int *map);
+t_object 	*w_recalculate_y(t_object *obj, int *map);
+/**/
+
+/*
+** TIMER CONTROLS FCTS
+**/
+void timer_print(t_list *list, t_mlx *mlx);
+/**/
+
 t_list	*get_worm(t_list *object);
+void free_obj(t_list **object, t_list *elem);
 
 int		get_pxl_val(int *img, int x, int y);
 

@@ -1,5 +1,6 @@
 #include "worms.h"
 
+/*
 void 	w_speed(t_object *obj, int *map)
 {
 	if (get_pxl_val(map, obj->x, obj->y + 1) == WORMS_COLOR_BACK || obj->vy > 0.5 || obj->vy < -0.5)
@@ -8,8 +9,9 @@ void 	w_speed(t_object *obj, int *map)
 		obj->vy = 0.0;
 	obj->vx /= WORMS_F;
 	(void)map;
-}
+}*/
 
+/*
 int		get_inc_x(int x, int y, int *map)
 {
 	int i;
@@ -72,7 +74,9 @@ t_object 	*w_recalculate_y(t_object *obj, int *map)
 	obj->x = (double)(x);
 	return (obj);
 }
+*/
 
+/*
 unsigned char *get_collision_const(void)
 {
 	static unsigned char mask[12] = {
@@ -116,7 +120,6 @@ int 	get_transpho(int x, int y, int *map)
 	unsigned char *tab_mask;
 	int i;
 
-//TODO Mask ne reconnais pas bien les pentes
 	mask = get_collision_mask(x, y, map);
 	tab_mask = get_collision_const();
 	i = -1;
@@ -134,7 +137,6 @@ void 	w_recalculate_speed(t_object *obj, int *map)
 	double tmp;
 
 	i = get_transpho(obj->x, obj->y, map);
-	//ft_putnbr(i); ft_putchar('\n');
 	if (i == -1 || obj->type == 1)
 	{
 		obj->vx = 0.0;
@@ -161,9 +163,9 @@ void 	w_recalculate_speed(t_object *obj, int *map)
 	}
 	obj->vy /= ABSORBANCE_T;
 	obj->vx /= (0.2 / (obj->vx * obj->vx) + ABSORBANCE_T);
-}
+}*/
 
-
+/*
 void 	w_update_pos(t_object *obj, int *map)
 {
 	double i;
@@ -196,8 +198,9 @@ void 	w_update_objs(t_list *objects, int *map)
 		w_update_pos(obj, map);
 		objects = objects->next;
 	}
-}
+}*/
 
+/*
 void free_obj(t_list **object, t_list *elem)
 {
 	t_list 	*buff;
@@ -223,8 +226,9 @@ void free_obj(t_list **object, t_list *elem)
 		if (list->next)
 			list = list->next;
 	}
-}
+}*/
 
+/*
 int	*set_map_pxl(int *map, int x, int y, int color)
 {
 	if (x < 800 && y < 500 && x > -1 && y > -1)
@@ -275,8 +279,9 @@ void 	update_time_objects(t_list **object, t_mlx *mlx)
 		}
 		list = list->next;
 	}
-}
+}*/
 
+/*
 void timer_print(t_list *list, t_mlx *mlx)
 {
 	t_object *obj;
@@ -288,8 +293,9 @@ void timer_print(t_list *list, t_mlx *mlx)
 			mlx_string_put(mlx->mlx, mlx->win, obj->x - 5, obj->y - 25, 0x00ff0000, ft_itoa(obj->live - time(NULL)));
 		list = list->next;
 	}
-}
+}*/
 
+/*
 t_list *get_next_worm(t_list *curr, t_list *list)
 {
 	curr = curr->next;
@@ -310,8 +316,10 @@ void 	update_time_status(t_mlx *mlx)
 		mlx->cnf.timer = time(NULL) + 30;
 		mlx->cnf.status = 0;
 	}
-}
+}*/
 
+// REFRESH
+/*
 int		refresh(void *param)
 {
 	t_mlx	*mlx;
@@ -329,8 +337,9 @@ int		refresh(void *param)
 	mlx_string_put(mlx->mlx, mlx->win, 780, 10, 0x00ff0000, ft_itoa(mlx->cnf.timer - time(NULL)));
 	timer_print(mlx->cnf.object, mlx);
 	return (0);
-}
+}*/
 
+/*
 int check_slop(int *map, int x, int y)
 {
 	int i;
@@ -381,8 +390,9 @@ t_mlx arrow_controls(t_mlx mlx, double key)
 	obj = mlx.cnf.current->content;
 	move_worm(obj, key, mlx.cnf.map);
 	return (mlx);
-}
+}*/
 
+/*
 t_mlx jump(t_mlx mlx)
 {
 	t_object 	*obj;
@@ -394,8 +404,9 @@ t_mlx jump(t_mlx mlx)
 		obj->vx = obj->ori == 1 ? 1.0 : -1.0;
 	}
 	return (mlx);
-}
+}*/
 
+/*
 t_mlx throw_grenade(t_mlx mlx)
 {
 	t_object 	*obj;
@@ -421,9 +432,10 @@ t_mlx throw_grenade(t_mlx mlx)
 	mlx.cnf.status = 1;
 	mlx.cnf.timer = time(NULL) + 5;
 	return (mlx);
-}
+}*/
 
-void update_viseur(t_mlx *mlx, int key_hook)
+/*
+void update_scope(t_mlx *mlx, int key_hook)
 {
 	if (key_hook == 126 && mlx->cnf.angle < 180)
 	{
@@ -433,8 +445,9 @@ void update_viseur(t_mlx *mlx, int key_hook)
 	{
 		mlx->cnf.angle--;
 	}
-}
+}*/
 
+/*
 void update_gre_timer(t_mlx *mlx, int key_hook)
 {
 		if (key_hook == 18)
@@ -447,22 +460,23 @@ void update_gre_timer(t_mlx *mlx, int key_hook)
 			mlx->cnf.gre_timer = 4;
 		if (key_hook == 23)
 			mlx->cnf.gre_timer = 5;
-}
+}*/
 
+// ACTIONS
+/*
 int		actions(int key_hook, void *param)
 {
 	t_mlx	*mlx;
 
 	mlx = (t_mlx*)param;
-	// bas 125 - haut 126
 	// ft_putnbr(key_hook); ft_putchar('\n');
 	if (key_hook == 18 || key_hook == 19 || key_hook == 20 || key_hook == 21
 		|| key_hook == 23)
 		update_gre_timer(mlx, key_hook);
 	if (key_hook == 125 || key_hook == 126)
-		update_viseur(mlx, key_hook);
+		update_scope(mlx, key_hook);
 	if (key_hook == 123 || key_hook == 124)
-		*mlx = arrow_controls(*mlx, (key_hook == 124) ? 0.5 : -0.5);
+		*mlx = move_controls(*mlx, (key_hook == 124) ? 0.5 : -0.5);
 	if (key_hook == 49)
 		*mlx = jump(*mlx);
 	if (key_hook == 12 && mlx->cnf.status == 0)
@@ -473,7 +487,7 @@ int		actions(int key_hook, void *param)
 		exit(1);
 	}
 	return (0);
-}
+}*/
 
 int		mouse_on(int button, int x, int y, void *param)
 {
